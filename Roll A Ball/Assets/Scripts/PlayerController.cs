@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class PlayerController : MonoBehaviour
     public GameObject winTextObject;
     private int count;
 
+    private AudioManager audioManager;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,6 +24,7 @@ public class PlayerController : MonoBehaviour
         count = 0;
         SetCountText();
         winTextObject.SetActive(false);
+        audioManager = GameObject.FindGameObjectWithTag("AudioManager").GetComponent<AudioManager>();
     }
 
     void OnMove(InputValue movementValue)
@@ -38,16 +42,35 @@ public class PlayerController : MonoBehaviour
             other.gameObject.SetActive(false);
             count += 1;
             SetCountText();
+
+            if (hasWon())
+            {
+                SetWinningStuff();
+            }
+            else
+            {
+                audioManager.PlayRandomPickupSound();
+            }
         }
+    }
+
+    void SetWinningStuff() {
+        SetWinText();
+        audioManager.PlayWinSound();
     }
 
     void SetCountText()
     {
         countText.text = "Count: " + count.ToString();
-        if (count >= 10)
-        {
-            winTextObject.SetActive(true);
-        }
+    }
+    
+    void SetWinText()
+    {
+        winTextObject.SetActive(true);
+    }
+
+    private bool hasWon() {
+        return count >= 10;
     }
 
     private void FixedUpdate()
